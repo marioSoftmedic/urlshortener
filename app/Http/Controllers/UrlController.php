@@ -30,9 +30,9 @@ class UrlController extends Controller
      */
     public function store(UrlRequest $request)
     {
-        Url::create($request->all());
+        $url = Url::create($request->all());
 
-        return response('Created', Response::HTTP_CREATED);
+        return response($url, Response::HTTP_CREATED);
     }
 
     /**

@@ -2164,23 +2164,59 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       original_url: "",
-      errors: {}
+      errors: {},
+      items: []
     };
+  },
+  mounted: function mounted() {
+    this.fetchData();
   },
   methods: {
     submit: function submit() {
       var _this = this;
 
+      if (this.original_url == "") return;
       axios.post('/api/url', {
         original_url: this.original_url
       }).then(function (res) {
-        console.log(res);
+        _this.original_url = '';
+
+        _this.items.push(res.data);
       })["catch"](function (err) {
         _this.errors = err.response.data.errors;
+      });
+    },
+    fetchData: function fetchData() {
+      var _this2 = this;
+
+      axios.get("/api/url").then(function (res) {
+        _this2.items = res.data; // console.log(res.data);
+      })["catch"](function (e) {// this.errors =e.response.data.errors
       });
     }
   }
@@ -34811,6 +34847,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/css/app.css":
+/*!*******************************!*\
+  !*** ./resources/css/app.css ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
+
+
+/***/ }),
+
 /***/ "./node_modules/popper.js/dist/esm/popper.js":
 /*!***************************************************!*\
   !*** ./node_modules/popper.js/dist/esm/popper.js ***!
@@ -38080,8 +38129,25 @@ var render = function() {
           ]),
           _vm._v(" "),
           _c("input", {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.original_url,
+                expression: "original_url"
+              }
+            ],
             staticClass: "p-2 rounded-md shadow-md w-64",
-            attrs: { type: "text", placeholder: "Paste your URL" }
+            attrs: { type: "text", placeholder: "Paste your URL" },
+            domProps: { value: _vm.original_url },
+            on: {
+              input: function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.original_url = $event.target.value
+              }
+            }
           }),
           _vm._v(" "),
           _c("i", {
@@ -38096,10 +38162,53 @@ var render = function() {
             _vm._v(_vm._s(_vm.errors.original_url[0]))
           ])
         : _vm._e()
+    ]),
+    _vm._v(" "),
+    _c("section", { staticClass: "mt-5 flex justify-center" }, [
+      _c("div", { staticClass: "border rounded-md p-4" }, [
+        _c("table", [
+          _vm._m(0),
+          _vm._v(" "),
+          _c(
+            "tbody",
+            _vm._l(_vm.items, function(item) {
+              return _c("tr", { key: item.id }, [
+                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                  _vm._v(_vm._s(item.original_url))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                  _vm._v(_vm._s(item.shorten_url))
+                ]),
+                _vm._v(" "),
+                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                  _vm._v(_vm._s(item.created_at))
+                ])
+              ])
+            }),
+            0
+          )
+        ])
+      ])
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Original URL")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Shorten URL")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Created at")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -50448,7 +50557,8 @@ module.exports = JSON.parse('{"name":"axios","version":"0.21.4","description":"P
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
 /******/ 	__webpack_require__.O(undefined, ["css/app"], () => (__webpack_require__("./resources/js/app.js")))
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["css/app"], () => (__webpack_require__("./resources/sass/app.scss")))
+/******/ 	__webpack_require__.O(undefined, ["css/app"], () => (__webpack_require__("./resources/sass/app.scss")))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["css/app"], () => (__webpack_require__("./resources/css/app.css")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
