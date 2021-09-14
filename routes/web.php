@@ -15,5 +15,5 @@ use App\Http\Controllers\UrlController;
 */
 
 Route::view('/', 'welcome');
-
-Route::get('{url}', [UrlController::class, 'show']);
+Route::get('u/{url}', [UrlController::class, 'show']);
+Route::view('{url}', 'welcome');

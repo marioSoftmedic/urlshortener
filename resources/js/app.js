@@ -11,18 +11,7 @@ window.Vue = require('vue').default;
 Vue.component('main-component', require('./Main.vue').default);
 Vue.use(require("bridge-vue-notification"));
 
-import VueRouter from 'vue-router';
-Vue.use(VueRouter);
-
-import Index from "./pages/index";
-
-const routes =[
-    {path: '/', component:Index}
-]
-
-const router = new VueRouter ({
-    routes
-});
+import router from './router';
 
 const app = new Vue({
     router,

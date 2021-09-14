@@ -24,7 +24,7 @@
                 <tbody>
                     <tr v-for="item in items" :key="item.id">
                         <td class="p-2 rounded border text-sm">{{item.original_url}}</td>
-                        <td class="p-2 rounded border text-sm"><a :href="item.shorten_url" target="_blank">{{item.shorten_url}}
+                        <td class="p-2 rounded border text-sm"><a :href="item.path" target="_blank">{{item.shorten_url}}
                             <i class="fas fa-external-link-alt ml-2"></i>
                             </a></td>
                         <td class="p-2 rounded border text-sm">{{item.visits}}</td>

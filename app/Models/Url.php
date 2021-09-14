@@ -12,6 +12,7 @@ class Url extends Model
     use HasFactory;
 
     protected $fillable = ['original_url', 'shorten_url'];
+    protected $appends = ['path'];
 
     protected static function boot()
     {
@@ -30,5 +31,10 @@ class Url extends Model
     public function getCreatedAtAttribute($value)
     {
         return Carbon::parse($value)->diffForHumans();
+    }
+
+    public function getPathAttribute()
+    {
+        return asset("u/$this->shorten_url");
     }
 }
