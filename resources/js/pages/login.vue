@@ -19,6 +19,8 @@
                         v-model="form.password"
                     />
                 </div>
+
+                <a href="">Forgot Password</a>
                 <div class="py-2 w-full">
                     <input
                         type="submit"
@@ -33,6 +35,7 @@
 
 <script>
 export default {
+    middleware:"guest",
     data() {
         return {
             form: {
@@ -42,7 +45,13 @@ export default {
         };
     },
     methods:{
-        submit(){}
+        submit(){
+            axios.post('/login', this.form)
+            .then(res=> {
+                window.location="/";
+            })
+            .catch(e=> console.log(e.response));
+        }
     }
 };
 </script>

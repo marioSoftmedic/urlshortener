@@ -2135,7 +2135,25 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({});
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      loggedIn: window.loggedIn,
+      user: window.user
+    };
+  },
+  methods: {
+    logout: function logout() {
+      axios.post('logout').then(function (res) {
+        return window.location = "/login";
+      });
+    }
+  }
+});
 
 /***/ }),
 
@@ -2193,7 +2211,33 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  middleware: "auth",
   data: function data() {
     return {
       original_url: "",
@@ -2209,15 +2253,15 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       if (this.original_url == "") return;
-      axios.post('/api/url', {
+      axios.post("/url", {
         original_url: this.original_url
       }).then(function (res) {
-        _this.original_url = '';
+        _this.original_url = "";
 
         _this.items.push(res.data);
 
         _this.$notify({
-          message: 'Created succesfully'
+          message: "Created succesfully"
         });
       })["catch"](function (err) {
         _this.errors = err.response.data.errors;
@@ -2226,7 +2270,7 @@ __webpack_require__.r(__webpack_exports__);
     fetchData: function fetchData() {
       var _this2 = this;
 
-      axios.get("/api/url").then(function (res) {
+      axios.get("/url").then(function (res) {
         _this2.items = res.data; // console.log(res.data);
       })["catch"](function (e) {// this.errors =e.response.data.errors
       });
@@ -2234,15 +2278,15 @@ __webpack_require__.r(__webpack_exports__);
     destroy: function destroy(item) {
       var _this3 = this;
 
-      if (confirm('Are you sure you want to Delete?')) {
-        axios["delete"]("api/url/".concat(item.shorten_url)).then(function () {
+      if (confirm("Are you sure you want to Delete?")) {
+        axios["delete"]("url/".concat(item.shorten_url)).then(function () {
           _this3.items = _this3.items.filter(function (i) {
             return i.id != item.id;
           });
 
           _this3.$notify({
-            message: 'Deleted',
-            type: 'warning'
+            message: "Deleted",
+            type: "warning"
           });
         });
       }
@@ -2296,7 +2340,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  middleware: "guest",
   data: function data() {
     return {
       form: {
@@ -2306,7 +2353,13 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    submit: function submit() {}
+    submit: function submit() {
+      axios.post('/login', this.form).then(function (res) {
+        window.location = "/";
+      })["catch"](function (e) {
+        return console.log(e.response);
+      });
+    }
   }
 });
 
@@ -2373,6 +2426,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  middleware: "guest",
   data: function data() {
     return {
       form: {
@@ -2384,7 +2438,15 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
-    submit: function submit() {}
+    submit: function submit() {
+      var _this = this;
+
+      axios.post('/register', this.form).then(function (res) {
+        _this.$router.push("/");
+      })["catch"](function (e) {
+        return console.log(e.response);
+      });
+    }
   }
 });
 
@@ -2484,19 +2546,39 @@ vue__WEBPACK_IMPORTED_MODULE_0__["default"].use(vue_router__WEBPACK_IMPORTED_MOD
 
 
 var routes = [{
-  path: '/',
+  path: "/",
   component: _pages_index__WEBPACK_IMPORTED_MODULE_2__["default"]
 }, {
-  path: '/login',
+  path: "/login",
   component: _pages_login__WEBPACK_IMPORTED_MODULE_3__["default"]
 }, {
-  path: '/register',
+  path: "/register",
   component: _pages_register__WEBPACK_IMPORTED_MODULE_4__["default"]
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]({
   routes: routes,
   hashbang: false,
   mode: "history"
+});
+router.beforeEach(function (to, from, next) {
+  // console.log(window.loggedIn);
+  var middleware = to.matched[0].components["default"].middleware;
+
+  if (middleware == "guest") {
+    if (window.loggedIn) {
+      next("/");
+      return;
+    }
+  }
+
+  if (middleware == "auth") {
+    if (!window.loggedIn) {
+      next("/login");
+      return;
+    }
+  }
+
+  next();
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (router);
 
@@ -44274,23 +44356,46 @@ var render = function() {
         [_vm._v("Home")]
       ),
       _vm._v(" "),
-      _c(
-        "div",
-        [
-          _c(
-            "router-link",
-            { staticClass: "px-3 cursor-pointer", attrs: { to: "/login" } },
-            [_vm._v("Login")]
-          ),
-          _vm._v(" "),
-          _c(
-            "router-link",
-            { staticClass: "px-3 cursor-pointer", attrs: { to: "/register" } },
-            [_vm._v("Register")]
+      _vm.loggedIn
+        ? _c("div", { staticClass: "flex" }, [
+            _c("p", { staticClass: "mx-3" }, [
+              _vm._v("Hi! " + _vm._s(_vm.user.name))
+            ]),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                attrs: { href: "" },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.logout.apply(null, arguments)
+                  }
+                }
+              },
+              [_vm._v("Logout")]
+            )
+          ])
+        : _c(
+            "div",
+            [
+              _c(
+                "router-link",
+                { staticClass: "px-3 cursor-pointer", attrs: { to: "/login" } },
+                [_vm._v("Login")]
+              ),
+              _vm._v(" "),
+              _c(
+                "router-link",
+                {
+                  staticClass: "px-3 cursor-pointer",
+                  attrs: { to: "/register" }
+                },
+                [_vm._v("Register")]
+              )
+            ],
+            1
           )
-        ],
-        1
-      )
     ],
     1
   )
@@ -44374,50 +44479,71 @@ var render = function() {
     _vm._v(" "),
     _c("section", { staticClass: "mt-5 flex justify-center" }, [
       _c("div", { staticClass: "border rounded-md p-4" }, [
-        _c("table", [
-          _vm._m(0),
-          _vm._v(" "),
-          _c(
-            "tbody",
-            _vm._l(_vm.items, function(item) {
-              return _c("tr", { key: item.id }, [
-                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
-                  _vm._v(_vm._s(item.original_url))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
-                  _c("a", { attrs: { href: item.path, target: "_blank" } }, [
-                    _vm._v(
-                      _vm._s(item.shorten_url) + "\n                        "
-                    ),
-                    _c("i", { staticClass: "fas fa-external-link-alt ml-2" })
+        _vm.items.length > 0
+          ? _c("table", [
+              _vm._m(0),
+              _vm._v(" "),
+              _c(
+                "tbody",
+                _vm._l(_vm.items, function(item) {
+                  return _c("tr", { key: item.id }, [
+                    _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(item.original_url) +
+                          "\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                      _c(
+                        "a",
+                        { attrs: { href: item.path, target: "_blank" } },
+                        [
+                          _vm._v(
+                            _vm._s(item.shorten_url) +
+                              "\n                                "
+                          ),
+                          _c("i", {
+                            staticClass: "fas fa-external-link-alt ml-2"
+                          })
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(item.visits) +
+                          "\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                      _vm._v(
+                        "\n                            " +
+                          _vm._s(item.created_at) +
+                          "\n                        "
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("td", { staticClass: "p-2 rounded border text-sm" }, [
+                      _c("i", {
+                        staticClass:
+                          "fas fa-times text-red-300 hover:text-red-700 cursor-pointer",
+                        on: {
+                          click: function($event) {
+                            return _vm.destroy(item)
+                          }
+                        }
+                      })
+                    ])
                   ])
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
-                  _vm._v(_vm._s(item.visits))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
-                  _vm._v(_vm._s(item.created_at))
-                ]),
-                _vm._v(" "),
-                _c("td", { staticClass: "p-2 rounded border text-sm" }, [
-                  _c("i", {
-                    staticClass:
-                      "fas fa-times text-red-300 hover:text-red-700 cursor-pointer",
-                    on: {
-                      click: function($event) {
-                        return _vm.destroy(item)
-                      }
-                    }
-                  })
-                ])
-              ])
-            }),
-            0
-          )
-        ])
+                }),
+                0
+              )
+            ])
+          : _c("div", [_c("h2", [_vm._v("No shorten URL yet")])])
       ])
     ])
   ])
@@ -44534,6 +44660,8 @@ var render = function() {
                 }
               })
             ]),
+            _vm._v(" "),
+            _c("a", { attrs: { href: "" } }, [_vm._v("Forgot Password")]),
             _vm._v(" "),
             _vm._m(0)
           ]

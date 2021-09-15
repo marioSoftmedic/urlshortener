@@ -15,6 +15,10 @@
         integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <script>
+        window.user = @json(auth()->user());
+        window.loggedIn = @json(auth()->check());
+    </script>
 </head>
 
 <body>

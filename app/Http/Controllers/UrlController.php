@@ -17,7 +17,7 @@ class UrlController extends Controller
      */
     public function index()
     {
-        return Url::latest()->get();
+        return auth()->user()->urls;
     }
 
 
@@ -30,7 +30,8 @@ class UrlController extends Controller
      */
     public function store(UrlRequest $request)
     {
-        $url = Url::create($request->all());
+        // $url = Url::create($request->all());
+        $url = auth()->user()->urls()->create($request->all());
 
         return response($url, Response::HTTP_CREATED);
     }
