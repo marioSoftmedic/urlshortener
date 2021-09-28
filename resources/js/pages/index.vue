@@ -1,103 +1,61 @@
 <template>
-    <div>
-        <div class="text-center mt-5">
-            <form action="" @submit.prevent="submit">
-                <h1 class="text-2xl">Shorten Your Big URL</h1>
-                <input
-                    type="text"
-                    placeholder="Paste your URL"
-                    class="p-2 rounded-md shadow-md w-64"
-                    v-model="original_url"
-                />
-                <i
-                    class="fas fa-paper-plane text-yellow-500 cursor-pointer"
-                    @click="submit"
-                ></i>
-            </form>
-            <span class="text-xs text-red-500" v-if="errors.original_url">{{
-                errors.original_url[0]
-            }}</span>
+    <div class="flex flex-wrap">
+        <div class="w-full p-4">
+            <button
+                class="float-right px-1 py-2 bg-yellow-600 rounded shadow w-32 text-white"
+                @click="openModal"
+            >
+                New
+            </button>
         </div>
-        <section class="mt-5 flex justify-center">
-            <div class="border rounded-md p-4">
-                <table v-if="items.length > 0">
-                    <thead>
-                        <tr>
-                            <th>Original URL</th>
-                            <th>Shorten URL</th>
-                            <th>Visits</th>
-                            <th>Created at</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in items" :key="item.id">
-                            <td class="p-2 rounded border text-sm">
-                                {{ item.original_url }}
-                            </td>
-                            <td class="p-2 rounded border text-sm">
-                                <a :href="item.path" target="_blank"
-                                    >{{ item.shorten_url }}
-                                    <i
-                                        class="fas fa-external-link-alt ml-2"
-                                    ></i>
-                                </a>
-                            </td>
-                            <td class="p-2 rounded border text-sm">
-                                {{ item.visits }}
-                            </td>
-                            <td class="p-2 rounded border text-sm">
-                                {{ item.created_at }}
-                            </td>
-                            <td class="p-2 rounded border text-sm">
-                                <i
-                                    @click="destroy(item)"
-                                    class="fas fa-times text-red-300 hover:text-red-700 cursor-pointer"
-                                ></i>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div v-else>
-                    <h2>No shorten URL yet</h2>
-                </div>
-            </div>
-        </section>
+        <div class="w-full flex">
+            <left-bar
+                @urlSelected="showDetails"
+                :allItems="items"
+                :items="items.data"
+            />
+            <right-bar :data="selectedItem" @deleteItem="destroy" />
+        </div>
+        <transition name="fade">
+            <create-modal
+                :show="modalOpen"
+                @closeModal="modalOpen = false"
+                :items="items.data"
+            />
+        </transition>
     </div>
 </template>
 
 <script>
+import CreateModal from "../components/index/createModal.vue";
+import LeftBar from "../components/index/leftBar.vue";
+import RightBar from "../components/index/rightBar.vue";
 export default {
+    components: { LeftBar, RightBar, CreateModal },
     middleware: "auth",
     data() {
         return {
-            original_url: "",
             errors: {},
-            items: []
+            items: { data: [] },
+            selectedItem: null,
+            modalOpen: false,
+            form: {
+                title: "",
+                original_url: ""
+            }
         };
     },
     mounted() {
-        this.fetchData();
+        this.fetchData(this.$route.query.page);
+        Event.$on("prevPage", this.prev);
+        Event.$on("nextPage", this.next);
     },
     methods: {
-        submit() {
-            if (this.original_url == "") return;
+        fetchData(page) {
+            // let queryPage = this.$route.query.page;
+            // page = queryPage ? queryPage:page;
             axios
-                .post("/url", {
-                    original_url: this.original_url
-                })
-                .then(res => {
-                    this.original_url = "";
-                    this.items.push(res.data);
-                    this.$notify({ message: "Created succesfully" });
-                })
-                .catch(err => {
-                    this.errors = err.response.data.errors;
-                });
-        },
-        fetchData() {
-            axios
-                .get("/url")
+                .get(`/url?page=${page}`)
                 .then(res => {
                     this.items = res.data;
                     // console.log(res.data);
@@ -109,10 +67,32 @@ export default {
         destroy(item) {
             if (confirm("Are you sure you want to Delete?")) {
                 axios.delete(`url/${item.shorten_url}`).then(() => {
-                    this.items = this.items.filter(i => i.id != item.id);
+                    this.items.data = this.items.data.filter(
+                        i => i.id != item.id
+                    );
                     this.$notify({ message: "Deleted", type: "warning" });
                 });
             }
+        },
+        showDetails(item) {
+            this.selectedItem = item;
+        },
+        openModal() {
+            this.modalOpen = true;
+        },
+        next() {
+            if (this.items.current_page == this.items.last_page) return;
+            let nextPageNumber = this.items.current_page + 1;
+
+            this.fetchData(nextPageNumber);
+            this.$router.replace({ query: { page: nextPageNumber } });
+        },
+        prev() {
+            let prevPageNumber = this.items.current_page - 1;
+            if (prevPageNumber == 0) return;
+
+            this.fetchData(prevPageNumber);
+            this.$router.replace({ query: { page: prevPageNumber } });
         }
     }
 };

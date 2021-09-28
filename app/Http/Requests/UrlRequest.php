@@ -24,7 +24,8 @@ class UrlRequest extends FormRequest
     public function rules()
     {
         return [
-            'original_url' => 'required|url'
+            'original_url' => 'required|url',
+            'title' => 'required'
         ];
     }
 

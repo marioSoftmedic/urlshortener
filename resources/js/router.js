@@ -5,11 +5,15 @@ Vue.use(VueRouter);
 import Index from "./pages/index";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import ForgotPassword from "./pages/forgot-password";
+import ResetPassword from "./pages/reset-password";
 
 const routes = [
     { path: "/", component: Index },
     { path: "/login", component: Login },
-    { path: "/register", component: Register }
+    { path: "/register", component: Register },
+    { path: "/forgot-password", component: ForgotPassword },
+    { path: "/password/reset/:token", component: ResetPassword }
 ];
 
 const router = new VueRouter({

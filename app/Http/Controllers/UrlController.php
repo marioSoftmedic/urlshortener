@@ -17,7 +17,7 @@ class UrlController extends Controller
      */
     public function index()
     {
-        return auth()->user()->urls;
+        return auth()->user()->urls()->paginate(2);
     }
 
 

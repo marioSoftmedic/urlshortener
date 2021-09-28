@@ -1,7 +1,7 @@
 <template>
     <div class="p-3 flex justify-center">
         <div class="w-1/2 py-10 flex flex-wrap justify-center border rounded">
-            <h1 class="text-3xl w-full text-center">Login Page</h1>
+            <h1 class="text-3xl w-full text-center">Reset Your Password</h1>
             <form
                 class="flex flex-wrap justify-center p-2"
                 @submit.prevent="submit"
@@ -13,9 +13,6 @@
                         class="p-2 w-full rounded border shadow"
                         v-model="form.email"
                     />
-                    <span class="text-xs text-red-500" v-if="errors.email">{{
-                        errors.email[0]
-                    }}</span>
                 </div>
                 <div class="py-2 w-full">
                     <input
@@ -24,20 +21,19 @@
                         class="p-2 w-full rounded border shadow"
                         v-model="form.password"
                     />
-                    <span class="text-xs text-red-500" v-if="errors.password">{{
-                        errors.password[0]
-                    }}</span>
                 </div>
-
-                <div class="w-full">
-                    <router-link to="/forgot-password" class="float-right">
-                        Forgot Password
-                    </router-link>
+                <div class="py-2 w-full">
+                    <input
+                        type="text"
+                        placeholder="Confirm Password"
+                        class="p-2 w-full rounded border shadow"
+                        v-model="form.password_confirmation"
+                    />
                 </div>
                 <div class="py-2 w-full">
                     <input
                         type="submit"
-                        value="Login"
+                        value="Reset Now"
                         class="px-3 py-2 bg-blue-500 rounded shadow border text-white w-full"
                     />
                 </div>
@@ -53,21 +49,21 @@ export default {
         return {
             form: {
                 email: "",
-                password: ""
-            },
-            errors: {}
+                token: "",
+                password: "",
+                password_confirmation: ""
+            }
         };
+    },
+    mounted() {
+        this.form.email = this.$route.query.email;
+        this.form.token = this.$route.params.token;
     },
     methods: {
         submit() {
-            axios
-                .post("/login", this.form)
-                .then(res => {
-                    window.location = "/";
-                })
-                .catch(e => {
-                    this.errors = e.response.data.errors;
-                });
+            axios.post("/password/reset", this.form).then(res => {
+                window.location = "/"
+            });
         }
     }
 };
